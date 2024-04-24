@@ -9,13 +9,16 @@
                 <el-input v-model="form.amount" type="text" placeholder="Wpisz liczbę"></el-input>
 
             </el-form-item>
-            <div>
-                <input type="file" @change="handleFileUpload">
-                <button @click="uploadFile">Upload</button>
-            </div>
-            <el-button type="primary" @click="handleSubmitExpense">Zapisz</el-button>
+            <el-form-item label="Zdjęcie">
+                <el-input v-model="form.file" type="file"></el-input>
+
+            </el-form-item>
+
+            <el-button type="primary" @click="handleSubmitExpense">Create</el-button>
 
         </el-form>
+
+
 
     </div>
 </template>
@@ -23,6 +26,8 @@
 <script>
 import AuthLayout from '@/layout/AuthLayout.vue';
 import axios from 'axios'
+import { ElMessage } from 'element-plus'
+
 var API_URL = ""
 if (window.location.hostname == 'localhost') {
     API_URL = "http://127.0.0.1:8000"
@@ -33,49 +38,56 @@ if (window.location.hostname == 'finanse.xce.pl') {
 export default {
     name: 'ExpenseView',
     components: {
-        AuthLayout
+        AuthLayout,
+
     },
     data() {
         return {
             form: {
                 name: '',
                 amount: '',
-                file: null
-            }
+            },
 
         }
     },
     methods: {
-        handleFileUpload(event) {
-            this.file = event.target.files[0];
-        },
-        async uploadFile() {
-            if (!this.file) {
-                return;
-            }
-            try {
-                const formData = new FormData()
-                const token = localStorage.getItem('token');
-                const url = `${API_URL}/api/upload_file`
 
-                formData.append('file', this.file);
-                const response = await axios.post(url, formData, {
-                    headers: {
-                        'Content-Type': 'multipart/form-data',
-                        'Authorization': `Token ${token}`,
+        handleSubmitExpense() {
+            const token = localStorage.getItem('token')
+            const headers = {
+                'Authorization': `Token ${token}`,
 
-                    }
+            };
+            const url = `${API_URL}/api/add_expense/`;
+            const data = new FormData();
+            data.append('name', this.form.name);
+            data.append('amount', this.form.amount);
+            data.append('file', this.form.file);
+            console.log(this.form.file)
+            axios.post(url, data, { headers })
+                .then((response) => {
+                    ElMessage.success('Wydatek został zapisany')
+                    console.log(response.data.data)
+
+                })
+                .catch(error => {
+                    console.error('Błąd:', error);
                 });
 
-                console.log(response.data);
-            } catch (error) {
-                console.error('Błąd:', error);
-            }
-        },
-        handleSubmitExpense() {
 
         }
 
     }
 }
 </script>
+<style scoped>
+.form-container {
+    display: flex;
+    justify-content: center;
+}
+
+.form-card {
+    width: 300px;
+    margin-bottom: 20px;
+}
+</style>

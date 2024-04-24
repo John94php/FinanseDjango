@@ -14,6 +14,10 @@ import json
 import datetime
 from django.db.models import Sum, DecimalField
 from django.db.models.functions import Coalesce
+import pytesseract
+from PIL import Image
+from rest_framework import status, serializers
+
 
 def index(request):
     return render(request, 'index.html')
@@ -194,6 +198,32 @@ class AddIncomeView(APIView):
                 'status': 'error',
                 'message': str(e)
             })
+
+
+class AddExpenseView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        data = request.data
+        if 'file' in data:
+            file = data['file']
+            self.handle_uploaded_file(file)
+            return Response({
+                'status': 'success',
+                'data': 'Dane przesłane poprawnie'
+            })
+        else:
+            return Response({
+                'status': 'error',
+                'message': 'Brak pliku w danych żądania'
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+
+    def handle_uploaded_file(self, file):
+        with open('images' + file.name, 'wb+') as destination:
+            for chunk in file.chunks():
+                destination.write(chunk)
 
 
 class EditIncomeView(APIView):

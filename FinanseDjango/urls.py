@@ -5,7 +5,7 @@ from django.conf.urls.static import static
 from django.views.generic import TemplateView
 
 from .views import CustomAuthToken, LogoutView, ExpenseView, IncomeView, BalanceView, error_404_view, \
-    ShopListView, AddIncomeView, index, StatisticView
+    ShopListView, AddIncomeView, index, StatisticView, AddExpenseView
 
 urlpatterns = [
                   path("admin/", admin.site.urls),
@@ -20,9 +20,10 @@ urlpatterns = [
                   path("api/shoplist/", ShopListView.as_view(), name="add_shoplist"),
                   path("api/getshoplists/", ShopListView.as_view(), name="get_shoplists"),
                   path("api/add_income/", AddIncomeView.as_view(), name="add_income"),
-                  path("api/statistics/",StatisticView.as_view(), name="stats")
+                  path("api/statistics/", StatisticView.as_view(), name="stats"),
+                  path("api/add_expense/", AddExpenseView.as_view(), name="add_expense")
 
-
-              ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+              ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) + static(settings.MEDIA_URL,
+                                                                                           document_root=settings.MEDIA_ROOT)
 
 handler404 = error_404_view

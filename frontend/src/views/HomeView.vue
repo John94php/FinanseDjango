@@ -3,16 +3,16 @@
     <AuthLayout />
     <div class="stats-container">
       <div class="stat">
-        <el-statistic title="Wydatki" :value="expenseValue" />
-        zł
+       Wydatki&nbsp;<el-tag type="danger">{{ expenseValue }} zł</el-tag>
+
       </div>
       <div class="stat">
-        <el-statistic title="Przychody" :value="incomeValue" />
-        zł
+        Przychody&nbsp;<el-tag type="success">{{ incomeValue }} zł</el-tag>
+
       </div>
       <div class="stat" >
-        <el-statistic title="Bilans" :value="balanceValue" />
-        zł
+        Budżet&nbsp;<el-tag type="info">{{ balanceValue }} zł</el-tag>
+
       </div>
     </div>
   </div>

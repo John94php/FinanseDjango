@@ -47,7 +47,7 @@ export default {
             this.$router.push('/income')
         },
         goExpense() {
-              this.$router.push('/expense')  
+            this.$router.push('/expense')
         },
         checkAuthenticated() {
             const token = localStorage.getItem('token')
@@ -72,6 +72,10 @@ export default {
                 .catch(error => {
                     // Obsłuż błąd żądania
                     console.error('Błąd podczas sprawdzania statusu logowania:', error)
+                    ElMessage.error('Zaloguj się, aby uzyskać dostęp do tej strony')
+                    this.$router.push('/')
+                    return
+
                 })
 
         },

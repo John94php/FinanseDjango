@@ -11,12 +11,8 @@ from rest_framework.authentication import TokenAuthentication
 from rest_framework.authtoken.serializers import AuthTokenSerializer
 from .models import ShopList, Income, Expense
 import json
-import datetime
 from django.db.models import Sum, DecimalField
 from django.db.models.functions import Coalesce
-import pytesseract
-from PIL import Image
-from rest_framework import status, serializers
 
 
 def index(request):
@@ -205,25 +201,38 @@ class AddExpenseView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
-        data = request.data
-        if 'file' in data:
-            file = data['file']
-            self.handle_uploaded_file(file)
-            return Response({
-                'status': 'success',
-                'data': 'Dane przesłane poprawnie'
-            })
+        if request.method == 'POST' and request.FILES:
+            try:
+                name_input = request.data.get('name')
+                amount_input = request.data.get('amount')
+                date_input = request.data.get('date')
+                uploaded_file = request.FILES.get('file')
+                with open('media/' + uploaded_file.name, 'wb+') as destination:
+                    for chunk in uploaded_file.chunks():
+                        destination.write(chunk)
+
+                current_user = request.user
+                user = User.objects.get(pk=current_user.id)
+                new_expense = Expense(name=name_input, amount=amount_input, expense_file=uploaded_file,
+                                      expense_date=date_input, user=user)
+                new_expense.save()
+                return JsonResponse({
+                    'status': 'OK',
+                    'code': '200'
+                })
+            except Exception as e:
+                return JsonResponse({
+                    'status': 'ERROR',
+                    'code': '500',
+                    'message': str(e)
+                })
+
+
+
         else:
-            return Response({
-                'status': 'error',
-                'message': 'Brak pliku w danych żądania'
-            }, status=status.HTTP_400_BAD_REQUEST)
-
-
-    def handle_uploaded_file(self, file):
-        with open('images' + file.name, 'wb+') as destination:
-            for chunk in file.chunks():
-                destination.write(chunk)
+            return JsonResponse({
+                'error': 'Brak pliku'
+            })
 
 
 class EditIncomeView(APIView):

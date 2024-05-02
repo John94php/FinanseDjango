@@ -1,18 +1,21 @@
 import json
+from datetime import datetime
+from decimal import Decimal
 
 from django.contrib.auth.models import User
-from django.http import JsonResponse, HttpResponse
-from django.shortcuts import render
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.authtoken.models import Token
-from rest_framework.authentication import TokenAuthentication
-from rest_framework.authtoken.serializers import AuthTokenSerializer
-from .models import ShopList, Income, Expense
-import json
 from django.db.models import Sum, DecimalField
 from django.db.models.functions import Coalesce
+from django.http import JsonResponse, HttpResponse
+from django.shortcuts import render
+from rest_framework.authentication import TokenAuthentication
+from rest_framework.authtoken.models import Token
+from rest_framework.authtoken.serializers import AuthTokenSerializer
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from django.utils.translation import gettext_lazy as _
+
+from .models import ShopList, Income, Expense
 
 
 def index(request):
@@ -66,6 +69,32 @@ class ExpenseView(APIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
 
+    def get(self, request, *args, **kwargs):
+        try:
+            current_user = request.user
+            user_id = current_user.id
+            list_of_expenses = Expense.objects.filter(user=user_id)
+            serialized_expenses = []
+            for expense in list_of_expenses:
+                serialized_income = {
+                    'id': expense.id,
+                    'name': expense.name,
+                    'amount': expense.amount,
+                    'user_id': expense.user_id,
+                    'expense_date': expense.expense_date.strftime('%Y-%m-%d %H:%M:%S'),
+                    'expense_file': expense.expense_file.url
+                }
+                serialized_expenses.append(serialized_income)
+
+            return JsonResponse({
+                'data': serialized_expenses,
+            })
+        except Exception as e:
+            return JsonResponse({
+                'status': 'error',
+                'message': str(e)
+            })
+
     def post(self, request, *args, **kwargs):
         action = request.data.get('action')
         return Response({"message": f"Akcja {action} została wykonana dla wydatków"})
@@ -87,7 +116,7 @@ class IncomeView(APIView):
                     'name': income.name,
                     'amount': income.amount,
                     'user_id': income.user_id,
-                    'income_date': income.income_date.strftime('%Y-%m-%d %H:%M:%S')  # Formatowanie daty
+                    'income_date': income.income_date.strftime('%Y-%m-%d %H:%M:%S')
                 }
                 serialized_incomes.append(serialized_income)
 
@@ -118,7 +147,28 @@ class StatisticView(APIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
 
+    def decimal_serializer(self, obj):
+        if isinstance(obj, Decimal):
+            return float(obj)
+        raise TypeError(f"Object of type {type(obj)} is not JSON serializable")
+
     def get(self, request):
+        monthly_report = {}
+        for month in range(1, 13):
+            month_name = datetime.strptime(str(month), "%m").strftime("%B")
+            translated_month_name = _(month_name)  # Tłumaczenie nazwy miesiąca
+
+            total_income = Income.objects.filter(income_date__month=month).aggregate(total=Sum('amount'))['total'] or 0
+            total_expense = Expense.objects.filter(expense_date__month=month).aggregate(total=Sum('amount'))[
+                                'total'] or 0
+            balance = total_income - total_expense
+            monthly_report[month] = {
+                'name': translated_month_name,
+
+                'incomes': total_income,
+                'expenses': total_expense,
+                'balance': balance
+            }
         total_income = Income.objects.filter(user=request.user).aggregate(
             total=Coalesce(Sum('amount'), 0, output_field=DecimalField())
         )['total']
@@ -130,7 +180,8 @@ class StatisticView(APIView):
         return Response({
             'incomes': total_income,
             'expenses': total_expense,
-            'balance': total_amount
+            'balance': total_amount,
+            'report': monthly_report
         })
 
 

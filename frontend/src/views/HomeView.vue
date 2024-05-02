@@ -3,22 +3,38 @@
     <AuthLayout />
     <div class="stats-container">
       <div class="stat">
-       Wydatki&nbsp;<el-tag type="danger">{{ expenseValue }} zł</el-tag>
+        Wydatki&nbsp;<el-tag type="danger">{{ expenseValue }} zł</el-tag>
 
       </div>
       <div class="stat">
         Przychody&nbsp;<el-tag type="success">{{ incomeValue }} zł</el-tag>
 
       </div>
-      <div class="stat" >
+      <div class="stat">
         Budżet&nbsp;<el-tag type="info">{{ balanceValue }} zł</el-tag>
 
       </div>
     </div>
   </div>
+
+  <div class="monthly-report">
+    <el-row :gutter="20">
+      <el-col :xs="24" :sm="12" :md="8" :lg="6" v-for="(data, month) in monthlyReport" :key="month">
+        <el-card>
+          <p>{{ data.name }}</p>
+        </el-card>
+        <el-descriptions :bordered="true"  size="small">
+          <el-descriptions-item label="Przychody">{{ data.incomes }} zł</el-descriptions-item>
+          <el-descriptions-item label="Wydatki">{{ data.expenses }} zł</el-descriptions-item>
+          <el-descriptions-item label="Bilans">{{ data.balance }} zł</el-descriptions-item>
+        </el-descriptions>
+      </el-col>
+    </el-row>
+  </div>
 </template>
 
 <script>
+
 import AuthLayout from '@/layout/AuthLayout.vue'
 import axios from 'axios';
 var API_URL = ""
@@ -39,39 +55,46 @@ export default {
     return {
       expenseValue: 0,
       incomeValue: 0,
-      balanceValue: 0
+      balanceValue: 0,
+      monthlyReport: {}
+
 
     }
   },
   created() {
-    this.getIncomeValue()
+    this.getStatisticValue()
   },
   methods: {
-    getIncomeValue() {
-      const token = localStorage.getItem('token');
-      const headers = {
-        'Authorization': `Token ${token}`,
-        'Content-Type': 'application/json'
-      };
+    async getStatisticValue() {
+      try {
+        const token = localStorage.getItem('token');
+        const headers = {
+          'Authorization': `Token ${token}`,
+          'Content-Type': 'application/json'
+        };
 
-      axios.get(`${API_URL}/api/statistics/`, { headers })
-        .then((response) => {
-          const incomes = response.data.incomes
-          const expenses = response.data.expenses
-          const balance = response.data.balance
-          this.incomeValue = incomes
-          this.expenseValue = expenses
-          this.balanceValue = balance
-        })
-        .catch(error => {
-          console.error('Błąd:', error);
-        });
+        const response = await axios.get(`${API_URL}/api/statistics/`, { headers });
+        const incomes = response.data.incomes;
+        const expenses = response.data.expenses;
+        const balance = response.data.balance;
+        
 
+        this.incomeValue = incomes;
+        this.expenseValue = expenses;
+        this.balanceValue = balance;
+        this.monthlyReport = response.data.report
+      } catch (error) {
+        console.error('Błąd:', error);
+        return [];
+      }
     }
   }
 }
 </script>
 <style scoped>
+.monthly-report {
+  padding: 20px;
+}
 .home {
   margin-top: 5px
 }

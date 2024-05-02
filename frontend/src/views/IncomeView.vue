@@ -51,10 +51,8 @@
             <el-form-item label="Kwota">
                 <el-input v-model="editedRow.amount"></el-input>
             </el-form-item>
-            <!-- Inne pola formularza -->
         </el-form>
 
-        <!-- Przyciski dialogowe -->
         <div class="dialog-footer">
             <el-button @click="editDialogVisible = false">Anuluj</el-button>
             <el-button type="primary" @click="saveChanges">Zapisz</el-button>
@@ -134,23 +132,20 @@ export default {
             done()
         },
         saveChanges() {
-            // Logika zapisu zmian
             console.log('Zapisano zmiany:', this.editedRow);
-            this.editDialogVisible = false; // Zamknij dialog po zapisaniu
+            this.editDialogVisible = false; 
         },
         editRow(row) {
-            // Logika edycji wiersza
             this.editDialogVisible = true
             this.editedRow = { ...row }; 
 
 
         },
         deleteRow(row) {
-            // Logika usuwania wiersza
             console.log('Usuń wiersz:', row);
         },
         checkScreenWidth() {
-            this.isDesktop = window.innerWidth >= 768; // Załóżmy, że minimalna szerokość ekranu dla urządzenia desktopowego wynosi 768 pikseli
+            this.isDesktop = window.innerWidth >= 768;
         },
         getIncomeData() {
             const token = localStorage.getItem('token');

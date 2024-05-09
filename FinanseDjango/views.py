@@ -7,19 +7,23 @@ from django.db.models import Sum, DecimalField
 from django.db.models.functions import Coalesce
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render
+from django.utils.translation import gettext_lazy as _
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.authtoken.models import Token
 from rest_framework.authtoken.serializers import AuthTokenSerializer
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from django.utils.translation import gettext_lazy as _
 
 from .models import ShopList, Income, Expense
 
 
 def index(request):
     return render(request, 'index.html')
+
+
+def home(request):
+    return render(request, 'home/index.html')
 
 
 def error_404_view(request, exception):

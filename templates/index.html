@@ -1,19 +1,53 @@
-{% load static %}
-<html lang="">
-<head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width,initial-scale=1">
-    <link rel="icon" href="{% static 'favicon.ico' %}">
-    <title>Finanse - do zarządzania budżetem domowym</title>
-    <script defer="defer" src="{% static 'js/chunk-vendors.9c88b810.js' %}"></script>
-    <script defer="defer" src="{% static 'js/app.2e00984e.js' %}"></script>
-    <link href="{% static 'css/chunk-vendors.75679893.css' %}" rel="stylesheet">
-    <link href="{% static 'css/app.bd071c00.css' %}" rel="stylesheet">
-</head>
-<body>
-<noscript><strong>We're sorry but frontend doesn't work properly without JavaScript enabled. Please enable it to
-    continue.</strong></noscript>
-<div id="app"></div>
-</body>
-</html>
+{% extends 'base.html' %}
+{% block title %}Finanse - Zaloguj się{% endblock %}
+
+{% block content %}
+<div id="root">
+    <form @submit.prevent="handleSubmit">
+      <div class="mb-3">
+        <label for="username">Username:</label>
+        <input type="text" id="username" class="form-control" v-model="username" />
+      </div>
+      <div class="mb-3">
+        <label for="password">Password:</label>
+        <input type="password" id="password" class="form-control" v-model="password" />
+      </div>
+      <div class="mb-3">
+        <button type="submit" class="btn btn-sm btn-outline-success">Login</button>
+      </div>
+    </form>
+  </div>
+  <script type="module">
+    const app = Vue.createApp({
+      data() {
+        return {
+          username: "",
+          password: ""
+        };
+      },
+      methods: {
+        handleSubmit() {
+          const data  = {
+            'username': this.username,
+            'password': this.password
+          };
+          console.log(data)
+          axios.post('/api/login/',data)
+          .then((response) => {
+            const token = response.data.token;
+            localStorage.setItem('token', token)
+            console.log(token)
+            if(token)
+            {
+              window.location.href = '/home'
+            }
+
+        })
+        }
+      }
+    });
+
+    app.mount('#root');
+  </script>
+
+{% endblock %}

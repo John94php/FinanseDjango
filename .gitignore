@@ -1,2 +1,4 @@
 FinanseDjango/settings.py
 frontend/node_modules
+FinanseDjango/.env.dev
+FinanseDjango/.env.prod

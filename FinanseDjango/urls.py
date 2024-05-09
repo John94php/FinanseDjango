@@ -2,14 +2,17 @@ from django.contrib import admin
 from django.urls import path, include, re_path
 from django.conf import settings
 from django.conf.urls.static import static
-from django.views.generic import TemplateView
+from django.contrib.auth import views as auth_views
 
 from .views import CustomAuthToken, LogoutView, ExpenseView, IncomeView, BalanceView, error_404_view, \
-    ShopListView, AddIncomeView, index, StatisticView, AddExpenseView
+    ShopListView, AddIncomeView, index, StatisticView, AddExpenseView, home
 
 urlpatterns = [
                   path("admin/", admin.site.urls),
-                  path('', index, name="main"),
+                  path('', auth_views.LoginView.as_view(), name='login'),
+                  path('logout/', auth_views.LogoutView.as_view(template_name='registration/logged_out.html'),
+                       name='logout'),  # Ustawienie template_name
+                  path('home/',home, name="home"),
                   path('api-auth/', include('rest_framework.urls')),
                   path('api/login/', CustomAuthToken.as_view(), name='api-login'),
                   path('api/userdata/', CustomAuthToken.as_view(), name="user_data"),

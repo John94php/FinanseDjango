@@ -60,6 +60,18 @@ def home(request):
     return render(request, 'home/index.html')
 
 
+def shop_list(request):
+    user = request.user
+    user_id = user.id
+
+    list_of_shoplists = ShopList.objects.filter(user=user_id)
+    print(list_of_shoplists)
+
+    return render(request, 'shoplist/index.html', {
+        'shop_lists': list_of_shoplists
+    })
+
+
 def wallet(request):
     user = request.user
     user_id = user.id

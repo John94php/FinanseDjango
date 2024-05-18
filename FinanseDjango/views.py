@@ -18,12 +18,73 @@ from rest_framework.views import APIView
 from .models import ShopList, Income, Expense
 
 
+def decimal_to_float(obj):
+    if isinstance(obj, Decimal):
+        return float(obj)
+    raise TypeError(f"Object of type {type(obj)} is not JSON serializable")
+
+
 def index(request):
     return render(request, 'index.html')
 
 
+def incomes(request):
+    user = request.user
+    user_id = user.id
+    list_of_incomes = Income.objects.filter(user=user_id)
+    quantity = len(list_of_incomes)
+
+    return render(request, 'incomes/index.html', {
+        'income_data': list_of_incomes,
+        'quantity': quantity
+    })
+    pass
+
+
+def expenses(request):
+    user = request.user
+    user_id = user.id
+
+    list_of_expenses = Expense.objects.filter(user=user_id)
+    quantity = len(list_of_expenses)
+
+    return render(request, 'expenses/index.html', {
+        'expense_data': list_of_expenses,
+        'quantity': quantity
+    })
+
+    pass
+
+
 def home(request):
     return render(request, 'home/index.html')
+
+
+def wallet(request):
+    user = request.user
+    user_id = user.id
+    list_of_incomes = Income.objects.filter(user=user_id)
+    list_of_expenses = Expense.objects.filter(user=user_id)
+
+    context = {
+        'income_data': list_of_incomes,
+        'expense_data': list_of_expenses
+    }
+
+    return render(request, 'wallet/index.html', context)
+
+
+def profile(request):
+    user = request.user
+    full_name = f"{user.first_name} {user.last_name}"
+
+    context = {
+        'username': user.username,
+        'email': user.email,
+        'fullName': full_name
+
+    }
+    return render(request, 'profile/index.html', context)
 
 
 def error_404_view(request, exception):
@@ -85,7 +146,7 @@ class ExpenseView(APIView):
                     'name': expense.name,
                     'amount': expense.amount,
                     'user_id': expense.user_id,
-                    'expense_date': expense.expense_date.strftime('%Y-%m-%d %H:%M:%S'),
+                    'date': expense.expense_date.strftime('%Y-%m-%d %H:%M:%S'),
                     'expense_file': expense.expense_file.url
                 }
                 serialized_expenses.append(serialized_income)
@@ -120,7 +181,7 @@ class IncomeView(APIView):
                     'name': income.name,
                     'amount': income.amount,
                     'user_id': income.user_id,
-                    'income_date': income.income_date.strftime('%Y-%m-%d %H:%M:%S')
+                    'date': income.income_date.strftime('%Y-%m-%d %H:%M:%S')
                 }
                 serialized_incomes.append(serialized_income)
 
@@ -143,8 +204,16 @@ class BalanceView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request, *args, **kwargs):
-        action = request.data.get('action')
-        return Response({"message": f"Akcja {action} została wykonana dla bilansu"})
+        total_income = Income.objects.filter(user=request.user).aggregate(
+            total=Coalesce(Sum('amount'), 0, output_field=DecimalField())
+        )['total']
+        total_expense = Expense.objects.filter(user=request.user).aggregate(
+            total=Coalesce(Sum('amount'), 0, output_field=DecimalField())
+        )['total']
+        total_amount = total_income - total_expense
+        return Response({
+            'amount': total_amount
+        })
 
 
 class StatisticView(APIView):
@@ -168,7 +237,6 @@ class StatisticView(APIView):
             balance = total_income - total_expense
             monthly_report[month] = {
                 'name': translated_month_name,
-
                 'incomes': total_income,
                 'expenses': total_expense,
                 'balance': balance

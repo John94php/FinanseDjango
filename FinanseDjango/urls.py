@@ -1,19 +1,24 @@
-from django.contrib import admin
-from django.urls import path, include, re_path
 from django.conf import settings
 from django.conf.urls.static import static
+from django.contrib import admin
 from django.contrib.auth import views as auth_views
+from django.urls import path, include
 
 from .views import CustomAuthToken, LogoutView, ExpenseView, IncomeView, BalanceView, error_404_view, \
-    ShopListView, AddIncomeView, index, StatisticView, AddExpenseView, home
+    ShopListView, AddIncomeView, StatisticView, AddExpenseView, home, wallet, profile, incomes, expenses
 
 urlpatterns = [
                   path("admin/", admin.site.urls),
                   path('', auth_views.LoginView.as_view(), name='login'),
                   path('logout/', auth_views.LogoutView.as_view(template_name='registration/logged_out.html'),
                        name='logout'),  # Ustawienie template_name
-                  path('home/',home, name="home"),
+                  path('home/', home, name="home"),
+                  path('wallet/', wallet, name='wallet'),
+                  path('incomes/', incomes, name="incomes"),
+                  path('expenses/', expenses, name="expenses"),
+                  path('profile', profile, name="profile"),
                   path('api-auth/', include('rest_framework.urls')),
+
                   path('api/login/', CustomAuthToken.as_view(), name='api-login'),
                   path('api/userdata/', CustomAuthToken.as_view(), name="user_data"),
                   path('api/logout/', LogoutView.as_view(), name="api_logout"),

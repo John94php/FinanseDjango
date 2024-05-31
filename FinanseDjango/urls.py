@@ -5,20 +5,14 @@ from django.contrib.auth import views as auth_views
 from django.urls import path, include
 
 from .views import CustomAuthToken, LogoutView, ExpenseView, IncomeView, BalanceView, error_404_view, \
-    ShopListView, AddIncomeView, StatisticView, AddExpenseView, home, wallet, profile, incomes, expenses,shop_list
+    ShopListView, AddIncomeView, StatisticView, AddExpenseView
 
 urlpatterns = [
                   path("admin/", admin.site.urls),
                   path('', auth_views.LoginView.as_view(), name='login'),
-                  path('logout/', auth_views.LogoutView.as_view(template_name='registration/logged_out.html'),
-                       name='logout'),  # Ustawienie template_name
-                  path('home/', home, name="home"),
-                  path('wallet/', wallet, name='wallet'),
-                  path('incomes/', incomes, name="incomes"),
-                  path('expenses/', expenses, name="expenses"),
-                  path('shoplist/',shop_list, name="shoplists"),
-                  path('profile', profile, name="profile"),
+
                   path('api-auth/', include('rest_framework.urls')),
+
 
                   path('api/login/', CustomAuthToken.as_view(), name='api-login'),
                   path('api/userdata/', CustomAuthToken.as_view(), name="user_data"),

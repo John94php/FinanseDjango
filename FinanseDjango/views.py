@@ -2,11 +2,13 @@ import json
 from datetime import datetime
 from decimal import Decimal
 
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.db.models import Sum, DecimalField
 from django.db.models.functions import Coalesce
 from django.http import JsonResponse, HttpResponse
-from django.shortcuts import render
+from django.shortcuts import render, redirect
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.authtoken.models import Token
@@ -24,79 +26,6 @@ def decimal_to_float(obj):
     raise TypeError(f"Object of type {type(obj)} is not JSON serializable")
 
 
-def index(request):
-    return render(request, 'index.html')
-
-
-def incomes(request):
-    user = request.user
-    user_id = user.id
-    list_of_incomes = Income.objects.filter(user=user_id)
-    quantity = len(list_of_incomes)
-
-    return render(request, 'incomes/index.html', {
-        'income_data': list_of_incomes,
-        'quantity': quantity
-    })
-    pass
-
-
-def expenses(request):
-    user = request.user
-    user_id = user.id
-
-    list_of_expenses = Expense.objects.filter(user=user_id)
-    quantity = len(list_of_expenses)
-
-    return render(request, 'expenses/index.html', {
-        'expense_data': list_of_expenses,
-        'quantity': quantity
-    })
-
-    pass
-
-
-def home(request):
-    return render(request, 'home/index.html')
-
-
-def shop_list(request):
-    user = request.user
-    user_id = user.id
-
-    list_of_shoplists = ShopList.objects.filter(user=user_id)
-    print(list_of_shoplists)
-
-    return render(request, 'shoplist/index.html', {
-        'shop_lists': list_of_shoplists
-    })
-
-
-def wallet(request):
-    user = request.user
-    user_id = user.id
-    list_of_incomes = Income.objects.filter(user=user_id)
-    list_of_expenses = Expense.objects.filter(user=user_id)
-
-    context = {
-        'income_data': list_of_incomes,
-        'expense_data': list_of_expenses
-    }
-
-    return render(request, 'wallet/index.html', context)
-
-
-def profile(request):
-    user = request.user
-    full_name = f"{user.first_name} {user.last_name}"
-
-    context = {
-        'username': user.username,
-        'email': user.email,
-        'fullName': full_name
-
-    }
-    return render(request, 'profile/index.html', context)
 
 
 def error_404_view(request, exception):
@@ -376,3 +305,10 @@ class EditIncomeView(APIView):
 
     def post(self, request):
         pass
+
+
+def add_expense(request):
+    if request.method == 'POST':
+        amount = request.POST.get('expenseAmount')
+        image = request.FILES.get('expenseImage')
+        print(amount)

@@ -2,13 +2,11 @@ import json
 from datetime import datetime
 from decimal import Decimal
 
-from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.db.models import Sum, DecimalField
 from django.db.models.functions import Coalesce
 from django.http import JsonResponse, HttpResponse
-from django.shortcuts import render, redirect
-from django.utils import timezone
+from django.shortcuts import render
 from django.utils.translation import gettext_lazy as _
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.authtoken.models import Token
@@ -26,6 +24,8 @@ def decimal_to_float(obj):
     raise TypeError(f"Object of type {type(obj)} is not JSON serializable")
 
 
+def index(request):
+    return HttpResponse("Witaj w API Finanse!")
 
 
 def error_404_view(request, exception):

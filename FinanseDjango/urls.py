@@ -5,7 +5,7 @@ from django.contrib.auth import views as auth_views
 from django.urls import path, include
 
 from .views import CustomAuthToken, LogoutView, ExpenseView, IncomeView, BalanceView, error_404_view, \
-    ShopListView, AddIncomeView, StatisticView, AddExpenseView, index
+    ShopListView, AddIncomeView, StatisticView, AddExpenseView, index, EditProfile
 urlpatterns = [
                   path("admin/", admin.site.urls),
                   path('', index, name="index"),
@@ -20,7 +20,9 @@ urlpatterns = [
                   path("api/getshoplists/", ShopListView.as_view(), name="get_shoplists"),
                   path("api/add_income/", AddIncomeView.as_view(), name="add_income"),
                   path("api/statistics/", StatisticView.as_view(), name="stats"),
-                  path("api/add_expense/", AddExpenseView.as_view(), name="add_expense")
+                  path("api/add_expense/", AddExpenseView.as_view(), name="add_expense"),
+                  path("api/edituserdata/", EditProfile.as_view(), name="edit_userdata")
+
 
               ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) + static(settings.MEDIA_URL,
                                                                                            document_root=settings.MEDIA_ROOT)

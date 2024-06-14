@@ -8,6 +8,7 @@ from django.db.models.functions import Coalesce
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render
 from django.utils.translation import gettext_lazy as _
+from rest_framework import status
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.authtoken.models import Token
 from rest_framework.authtoken.serializers import AuthTokenSerializer
@@ -16,6 +17,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from .models import ShopList, Income, Expense
+from .serializers import EditProfileSerializer
 
 
 def decimal_to_float(obj):
@@ -305,6 +307,23 @@ class EditIncomeView(APIView):
 
     def post(self, request):
         pass
+
+
+class EditProfile(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        serializer = EditProfileSerializer(data=request.data)
+        if serializer.is_valid():
+            user = request.user
+            user.username = serializer.validated_data['username']
+            user.email = serializer.validated_data['email']
+            user.first_name = serializer.validated_data['name']
+            user.last_name = serializer.validated_data['surname']
+            user.save()
+            return Response({"message": "Profile updated successfully"}, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 def add_expense(request):

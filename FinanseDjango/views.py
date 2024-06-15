@@ -174,8 +174,8 @@ class StatisticView(APIView):
             month_name = datetime.strptime(str(month), "%m").strftime("%B")
             translated_month_name = _(month_name)  # Tłumaczenie nazwy miesiąca
 
-            total_income = Income.objects.filter(income_date__month=month).aggregate(total=Sum('amount'))['total'] or 0
-            total_expense = Expense.objects.filter(expense_date__month=month).aggregate(total=Sum('amount'))[
+            total_income = Income.objects.filter(date__month=month).aggregate(total=Sum('amount'))['total'] or 0
+            total_expense = Expense.objects.filter(date__month=month).aggregate(total=Sum('amount'))[
                                 'total'] or 0
             balance = total_income - total_expense
             monthly_report[month] = {

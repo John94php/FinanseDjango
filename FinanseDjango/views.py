@@ -312,7 +312,6 @@ class EditIncomeView(APIView):
 class EditProfile(APIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
-
     def post(self, request):
         serializer = EditProfileSerializer(data=request.data)
         if serializer.is_valid():

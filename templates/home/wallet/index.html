@@ -7,11 +7,11 @@
         <div class="stats stats-vertical lg:stats-horizontal shadow bg-white p-4 rounded-lg">
             <div class="stat">
                 <div class="stat-title">Incomes</div>
-                <div class="stat-value">{{ incomes }} zł</div>
+                <div class="stat-value" style="color: green">{{ incomes }} zł</div>
             </div>
             <div class="stat">
                 <div class="stat-title">Expenses</div>
-                <div class="stat-value">{{ expenses }} zł</div>
+                <div class="stat-value" style="color: red">{{ expenses }} zł</div>
             </div>
             <div class="stat">
                 <div class="stat-title">Balance</div>
@@ -26,18 +26,8 @@
                 <h2 class="card-title">Monthly Balance Analysis</h2>
                 <div class="flex items-center gap-2">
                     {% if analysis_results.income_comparison == "current_month_lower" %}
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                             class="h-6 w-6 text-red-500">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                  d="M5 15l7-7 7 7"></path>
-                        </svg>
                         <span class="text-red-500">Current month's income is lower than last month.</span>
                     {% elif analysis_results.income_comparison == "current_month_higher" %}
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                             class="h-6 w-6 text-green-500">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                  d="M19 9l-7 7-7-7"></path>
-                        </svg>
                         <span class="text-green-500">Current month's income is higher than last month.</span>
                     {% else %}
                         <span>No income comparison data available.</span>
@@ -45,18 +35,8 @@
                 </div>
                 <div class="flex items-center gap-2">
                     {% if analysis_results.expense_comparison == "current_month_lower" %}
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                             class="h-6 w-6 text-green-500">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                  d="M5 15l7-7 7 7"></path>
-                        </svg>
                         <span class="text-green-500">Current month's expenses are lower than last month.</span>
                     {% elif analysis_results.expense_comparison == "current_month_higher" %}
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                             class="h-6 w-6 text-red-500">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                  d="M19 9l-7 7-7-7"></path>
-                        </svg>
                         <span class="text-red-500">Current month's expenses are higher than last month.</span>
                     {% else %}
                         <span>No expense comparison data available.</span>

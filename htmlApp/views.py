@@ -1,16 +1,18 @@
 from datetime import datetime
+from datetime import timedelta
 
 import requests
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.db.models import Sum, DecimalField
 from django.db.models.functions import Coalesce
-from django.shortcuts import render
+from django.http import HttpResponse
+from django.shortcuts import render,redirect,get_object_or_404
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
+from django.contrib import messages
 
 from FinanseDjango.models import *
-from django.utils import timezone
-from datetime import timedelta
 
 
 # Create your views here.
@@ -54,15 +56,28 @@ def incomes_view(request):
 @login_required
 def expenses_view(request):
     user = request.user
-    expenses = Expense.objects.filter(user=user.id)
-    paginator = Paginator(expenses, 10)
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
-    context = {
-        'expenses': expenses,
-        'page_obj': page_obj
-    }
-    return render(request, 'home/expenses/index.html', context)
+    if request.method == "POST":
+        name = request.POST['expense_name']
+        amount = request.POST['expense_amount']
+        file = request.FILES.get('expense_image')
+        date = request.POST['expense_date']
+        expense = Expense(name=name, amount=amount, date=date, user=user)
+        if file:
+            expense.expense_file = file
+        expense.save()
+        messages.success(request, 'Expense saved successfully')
+        return redirect('expenses')
+
+    else:
+        expenses = Expense.objects.filter(user=user.id)
+        paginator = Paginator(expenses, 10)
+        page_number = request.GET.get('page')
+        page_obj = paginator.get_page(page_number)
+        context = {
+            'expenses': expenses,
+            'page_obj': page_obj
+        }
+        return render(request, 'home/expenses/index.html', context)
 
 
 @login_required
@@ -110,12 +125,18 @@ def analyze_monthly_balances(user):
     previous_month_start = previous_month_end.replace(day=1)
 
     # Sumy przychodów i wydatków w bieżącym miesiącu
-    current_month_incomes = Income.objects.filter(date__gte=current_month_start, user=user.id).aggregate(Sum('amount'))['amount__sum'] or 0
-    current_month_expenses = Expense.objects.filter(date__gte=current_month_start, user=user.id).aggregate(Sum('amount'))['amount__sum'] or 0
+    current_month_incomes = Income.objects.filter(date__gte=current_month_start, user=user.id).aggregate(Sum('amount'))[
+                                'amount__sum'] or 0
+    current_month_expenses = \
+    Expense.objects.filter(date__gte=current_month_start, user=user.id).aggregate(Sum('amount'))['amount__sum'] or 0
 
     # Sumy przychodów i wydatków w poprzednim miesiącu
-    previous_month_incomes = Income.objects.filter(date__gte=previous_month_start, date__lte=previous_month_end).aggregate(Sum('amount'))['amount__sum'] or 0
-    previous_month_expenses = Expense.objects.filter(date__gte=previous_month_start, date__lte=previous_month_end).aggregate(Sum('amount'))['amount__sum'] or 0
+    previous_month_incomes = \
+    Income.objects.filter(date__gte=previous_month_start, date__lte=previous_month_end).aggregate(Sum('amount'))[
+        'amount__sum'] or 0
+    previous_month_expenses = \
+    Expense.objects.filter(date__gte=previous_month_start, date__lte=previous_month_end).aggregate(Sum('amount'))[
+        'amount__sum'] or 0
 
     # Porównanie przychodów
     if current_month_incomes > previous_month_incomes:
@@ -141,3 +162,5 @@ def analyze_monthly_balances(user):
         'previous_month_incomes': previous_month_incomes,
         'previous_month_expenses': previous_month_expenses
     }
+
+

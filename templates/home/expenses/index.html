@@ -3,9 +3,10 @@
 {% block title %}Expenses{% endblock %}
 
 {% block content %}
+    {% include 'home/expenses/add.html' %}
     <div class="overflow-x-auto">
+
         <table class="table">
-            <!-- head -->
             <thead>
             <tr>
                 <th></th>
@@ -25,8 +26,9 @@
                     <td>{{ expense.date }}</td>
                     <td class="p-4">
                         {% if expense.expense_file %}
-                         <a data-fancybox="gallery" href="{{ expense.expense_file.url }}">
-                                <img src="{{ expense.expense_file.url }}" alt="Receipt" class="w-24 h-16 object-cover rounded-lg">
+                            <a data-fancybox="gallery" href="{{ expense.expense_file.url }}">
+                                <img src="{{ expense.expense_file.url }}" alt="Receipt"
+                                     class="w-24 h-16 object-cover rounded-lg">
                             </a>
                         {% else %}
                             No receipt

@@ -1,0 +1,88 @@
+{% extends "_auth.html" %}
+
+{% block title %}Incomes{% endblock %}
+
+{% block content %}
+    <div class="overflow-x-auto">
+        <table class="table">
+            <!-- head -->
+            <thead>
+            <tr>
+                <th></th>
+                <th>Name</th>
+                <th>Amount</th>
+                <th>Date</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for income in page_obj.object_list %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ income.name }}</td>
+                    <td>{{ income.amount }} zł</td>
+                    <td>{{ income.date }}</td>
+                    <td>
+                        <button class="btn btn-block">View</button>
+                        <button class="btn btn-block">Edit</button>
+                        <button class="btn btn-block">Delete</button>
+
+
+                    </td>
+                </tr>
+            {% empty %}
+                <p>No data</p>
+            {% endfor %}
+            </tbody>
+        </table>
+        <!-- Paginacja -->
+    <div class="pagination">
+        <span class="step-links">
+            {% if page_obj.has_previous %}
+                <a href="?page=1">&laquo; first</a>
+                <a href="?page={{ page_obj.previous_page_number }}">previous</a>
+            {% else %}
+                <span class="disabled">&laquo; first</span>
+                <span class="disabled">previous</span>
+            {% endif %}
+
+            <span class="current">
+                Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+            </span>
+
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}">next</a>
+                <a href="?page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
+            {% else %}
+                <span class="disabled">next</span>
+                <span class="disabled">last &raquo;</span>
+            {% endif %}
+        </span>
+    </div>
+    </div>
+
+    <style>
+.pagination {
+    display: flex;
+    justify-content: center;
+    margin: 20px 0;
+}
+
+.pagination .step-links a, .pagination .step-links span {
+    margin: 0 5px;
+    padding: 5px 10px;
+    border: 1px solid #ddd;
+    color: #007bff;
+    text-decoration: none;
+}
+
+.pagination .step-links span.disabled {
+    color: #ddd;
+}
+
+.pagination .step-links .current {
+    font-weight: bold;
+}
+</style>
+
+{% endblock %}

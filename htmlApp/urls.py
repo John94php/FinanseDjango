@@ -13,6 +13,8 @@ urlpatterns = [
                        name='password_reset'),
                   path('main/', views.homepage, name='homepage'),
                   path('logout/', auth_views.LogoutView.as_view(), name='logout'),
+                  path('incomes/', views.incomes_view, name='incomes'),
+                  path('expenses/', views.expenses_view, name='expenses'),
+                  path('wallet/', views.wallet_view, name='wallet'),
 
-              ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) + static(settings.MEDIA_URL,
-                                                                                           document_root=settings.MEDIA_ROOT)
+              ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -3,5 +3,28 @@
 {% block title %}Homepage{% endblock %}
 
 {% block content %}
-Witaj, {{user.username }}
+<div class="flex flex-col lg:flex-row lg:items-start lg:justify-center gap-4 p-4">
+    <div role="alert" class="alert alert-info flex items-center gap-2">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="h-6 w-6 shrink-0 stroke-current">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
+        <span>Witaj {{ user.username }}</span>
+    </div>
+    <div class="max-w-md w-full bg-white shadow-lg rounded-lg p-6 mt-5 lg:mt-0">
+        {% if quote_text %}
+            <blockquote class="text-gray-800 italic">
+                <p class="text-xl">{{ quote_text }}</p>
+                <footer class="mt-4 text-gray-600 text-right">
+                    {% if quote_author %}
+                        - {{ quote_author }}
+                    {% else %}
+                        - Noname
+                    {% endif %}
+                </footer>
+            </blockquote>
+        {% else %}
+            <p class="text-center text-gray-500">No quotes available today.</p>
+        {% endif %}
+    </div>
+</div>
 {% endblock %}

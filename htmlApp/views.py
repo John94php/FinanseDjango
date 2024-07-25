@@ -41,16 +41,25 @@ def homepage(request):
 @login_required
 def incomes_view(request):
     user = request.user
-    incomes = Income.objects.filter(user=user.id)
-    paginator = Paginator(incomes, 10)
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
+    if request.method == 'POST':
+        name = request.POST.get('income_name')
+        amount = request.POST.get('income_amount')
+        date = request.POST.get('income_date')
+        new_income = Income(name=name, amount=amount, date=date, user=user)
+        new_income.save()
+        messages.success(request, 'Income saved successfully')
+        return redirect('incomes')
+    else:
+        incomes = Income.objects.filter(user=user.id)
+        paginator = Paginator(incomes, 10)
+        page_number = request.GET.get('page')
+        page_obj = paginator.get_page(page_number)
 
-    context = {
-        'incomes': incomes,
-        'page_obj': page_obj
-    }
-    return render(request, 'home/incomes/index.html', context)
+        context = {
+            'incomes': incomes,
+            'page_obj': page_obj
+        }
+        return render(request, 'home/incomes/index.html', context)
 
 
 @login_required

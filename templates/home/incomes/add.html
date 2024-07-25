@@ -8,32 +8,28 @@
         {% endfor %}
     {% endif %}
 </div>
-<button class="btn" onclick="expense_modal.showModal()">Add new expense</button>
-<dialog id="expense_modal" class="modal modal-bottom sm:modal-middle">
+<button class="btn" onclick="income_modal.showModal()">Add new income</button>
+<dialog id="income_modal" class="modal modal-bottom sm:modal-middle">
     <div class="modal-box">
-        <h3 class="text-lg font-bold">Add expense</h3>
+        <h3 class="text-lg font-bold">Add income</h3>
         <form method="post" enctype="multipart/form-data">
 
             {% csrf_token %}
             <div class="mb-3">
-                <label for="expense_name" class="badge">Name</label>
-                <input type="text" name="expense_name" id="expense_name" class="input input-bordered w-full max-w-xs"/>
+                <label for="income_name" class="badge">Name</label>
+                <input type="text" name="income_name" id="income_name" class="input input-bordered w-full max-w-xs"/>
             </div>
             <div class="mb-3">
-                <label for="expense_amount" class="badge">Amount</label>
-                <input type="number" step="0.01" id="expense_amount" name="expense_amount"
+                <label for="income_amount" class="badge">Amount</label>
+                <input type="number" step="0.01" id="income_amount" name="income_amount"
                        class="input input-bordered w-full max-w-xs"/>
             </div>
             <div class="mb-3">
-                <label class="badge">Receipt image</label>
-                <input type="file" class="file-input file-input-bordered w-full max-w-xs" id="expense_image" name="expense_image"/>
-            </div>
-            <div class="mb-3">
-                <label for="expense_date" class="badge">Date</label>
-                <input type="datetime-local" name="expense_date" id="expense_date"
+                <label for="income_date" class="badge">Date</label>
+                <input type="datetime-local" name="income_date" id="income_date"
                        class="input input-bordered w-full max-w-xs"/>
             </div>
-            <button class="btn btn-xs sm:btn-sm md:btn-md lg:btn-lg" type="submit">Save expense</button>
+            <button class="btn btn-xs sm:btn-sm md:btn-md lg:btn-lg" type="submit">Save income</button>
 
         </form>
         <div class="modal-action">

@@ -7,7 +7,7 @@ from django.core.paginator import Paginator
 from django.db.models import Sum, DecimalField
 from django.db.models.functions import Coalesce
 from django.http import HttpResponse
-from django.shortcuts import render,redirect,get_object_or_404
+from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from django.contrib import messages
@@ -137,15 +137,15 @@ def analyze_monthly_balances(user):
     current_month_incomes = Income.objects.filter(date__gte=current_month_start, user=user.id).aggregate(Sum('amount'))[
                                 'amount__sum'] or 0
     current_month_expenses = \
-    Expense.objects.filter(date__gte=current_month_start, user=user.id).aggregate(Sum('amount'))['amount__sum'] or 0
-
-    # Sumy przychodów i wydatków w poprzednim miesiącu
+        Expense.objects.filter(date__gte=current_month_start, user=user.id).aggregate(Sum('amount'))['amount__sum'] or 0
+    current_month_balance = current_month_incomes - current_month_expenses
     previous_month_incomes = \
-    Income.objects.filter(date__gte=previous_month_start, date__lte=previous_month_end).aggregate(Sum('amount'))[
-        'amount__sum'] or 0
+        Income.objects.filter(date__gte=previous_month_start, date__lte=previous_month_end).aggregate(Sum('amount'))[
+            'amount__sum'] or 0
     previous_month_expenses = \
-    Expense.objects.filter(date__gte=previous_month_start, date__lte=previous_month_end).aggregate(Sum('amount'))[
-        'amount__sum'] or 0
+        Expense.objects.filter(date__gte=previous_month_start, date__lte=previous_month_end).aggregate(Sum('amount'))[
+            'amount__sum'] or 0
+    previous_month_balance = previous_month_incomes - previous_month_expenses
 
     # Porównanie przychodów
     if current_month_incomes > previous_month_incomes:
@@ -169,7 +169,7 @@ def analyze_monthly_balances(user):
         'current_month_incomes': current_month_incomes,
         'current_month_expenses': current_month_expenses,
         'previous_month_incomes': previous_month_incomes,
-        'previous_month_expenses': previous_month_expenses
+        'previous_month_expenses': previous_month_expenses,
+        'current_month_balance': current_month_balance,
+        'previous_month_balance': previous_month_balance,
     }
-
-

@@ -1,0 +1,92 @@
+{% extends "_auth.html" %}
+
+{% block title %}Settings{% endblock %}
+
+{% block content %}
+    <div class="settings-container">
+        <div class="theme-selector">
+            <div class="header">
+                <span>Theme</span>
+            </div>
+            <div class="theme-container overflow-auto max-h-60">
+                <div class="join join-vertical">
+                    <form method="post" action="{% url 'save_theme' %}">
+                        {% csrf_token %}
+                        {% for theme in themes %}
+                            <label class="join-item flex items-center">
+                                <input
+                                        type="radio"
+                                        name="theme"
+                                        class="btn theme-controller"
+                                        aria-label="{{ theme }}"
+                                        value="{{ theme }}"/>
+                            </label>
+                        {% endfor %}
+                        <button class="btn btn-primary" type="submit" id="save-theme-btn">Save theme</button>
+
+                    </form>
+                </div>
+            </div>
+
+        </div>
+<div class="container mx-auto mt-10">
+    <h1 class="text-2xl font-bold mb-6">Zmiana Hasła</h1>
+    <form method="post">
+        {% csrf_token %}
+        {{ password_form.as_p }}
+        <button type="submit" class="btn btn-primary mt-4">Zmień Hasło</button>
+    </form>
+</div>
+
+    </div>
+    <style>
+        /* Dodaj klasę dla inputów z border */
+        input[type="password"] {
+            border: 1px solid #ccc;
+            padding: 0.5rem;
+            border-radius: 0.375rem;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        /* Stylizacja tekstów błędów jako kursywa */
+        .text-sm.text-red-600.italic {
+            color: #e3342f;
+            font-style: italic;
+            margin-top: 0.25rem;
+        }
+
+        /* Styl dla kontenera z ustawieniami */
+        .settings-container {
+            padding: 1rem; /* Margines wewnętrzny dla kontenera */
+        }
+
+        /* Styl dla nagłówka selektora motywu */
+        .theme-selector .header {
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+        }
+
+        /* Styl dla kontenera z motywami */
+        .theme-container {
+            max-height: 300px; /* Maksymalna wysokość kontenera; dostosuj według potrzeb */
+            overflow-y: auto; /* Dodaje przewijanie w pionie */
+            border: 1px solid #ddd; /* Opcjonalnie: Dodaje granicę dla lepszej wizualizacji */
+            border-radius: 0.375rem; /* Opcjonalnie: Zaokrąglenie narożników */
+            padding: 0.5rem; /* Opcjonalnie: Padding wewnętrzny */
+        }
+
+        /* Styl dla każdego elementu w join */
+        .join-item {
+            display: flex;
+            align-items: center;
+            padding: 0.5rem;
+        }
+
+        /* Opcjonalne stylowanie przycisków */
+        .btn.theme-controller {
+            margin-right: 0.5rem; /* Odstęp między przyciskiem a nazwą motywu */
+        }
+
+    </style>
+{% endblock %}

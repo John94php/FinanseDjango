@@ -1,13 +1,3 @@
-<!-- Flash messages -->
-<div class="fixed top-0 left-0 w-full p-4">
-    {% if messages %}
-        {% for message in messages %}
-            <div class="alert alert-success flash-message" id="flashMessage">
-                {{ message }}
-            </div>
-        {% endfor %}
-    {% endif %}
-</div>
 <button class="btn" onclick="income_modal.showModal()">Add new income</button>
 <dialog id="income_modal" class="modal modal-bottom sm:modal-middle">
     <div class="modal-box">

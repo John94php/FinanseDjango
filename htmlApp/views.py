@@ -7,18 +7,17 @@ from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth.views import PasswordChangeView
-from django.core.exceptions import ObjectDoesNotExist
 from django.core.paginator import Paginator
 from django.db.models import Sum, DecimalField
 from django.db.models.functions import Coalesce
 from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
 from django.utils.translation import gettext_lazy as _
-
-from FinanseDjango import settings
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+import json
 from FinanseDjango.models import *
 from .forms import CustomPasswordChangeForm
-from .models import Settings
 
 
 class CustomPasswordChangeView(PasswordChangeView):
@@ -26,7 +25,14 @@ class CustomPasswordChangeView(PasswordChangeView):
     success_url = reverse_lazy('password_change_done')
     template_name = 'registration/password_change.html'
 
-
+@csrf_exempt
+def set_theme(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        theme = data.get('theme', 'light')
+        request.session['theme'] = theme
+        return JsonResponse({'status': 'success'})
+    return JsonResponse({'status': 'fail'})
 def home(request):
     return render(request, 'index.html')
 
@@ -34,8 +40,6 @@ def home(request):
 @login_required
 def homepage(request):
     user = request.user
-    theme = get_actual_theme(user)
-
     response = requests.get('https://api.quotable.io/random')
     data = response.json()
     quote_text = data['content']
@@ -44,7 +48,6 @@ def homepage(request):
         'quote_text': quote_text,
         'quote_author': quote_author,
         'user': user,
-        'theme': theme
     }
 
     return render(request, 'home/homepage.html', context)
@@ -53,7 +56,6 @@ def homepage(request):
 @login_required
 def incomes_view(request):
     user = request.user
-    theme = get_actual_theme(user)
     if request.method == 'POST':
         name = request.POST.get('income_name')
         amount = request.POST.get('income_amount')
@@ -71,7 +73,6 @@ def incomes_view(request):
         context = {
             'incomes': incomes,
             'page_obj': page_obj,
-            'theme': theme
         }
         return render(request, 'home/incomes/index.html', context)
 
@@ -79,7 +80,6 @@ def incomes_view(request):
 @login_required
 def expenses_view(request):
     user = request.user
-    theme = get_actual_theme(user)
     if request.method == "POST":
         name = request.POST['expense_name']
         amount = request.POST['expense_amount']
@@ -100,7 +100,6 @@ def expenses_view(request):
         context = {
             'expenses': expenses,
             'page_obj': page_obj,
-            'theme': theme
         }
         return render(request, 'home/expenses/index.html', context)
 
@@ -108,7 +107,6 @@ def expenses_view(request):
 @login_required
 def wallet_view(request):
     user = request.user
-    theme = get_actual_theme(user)
     monthly_report = {}
     for month in range(1, 13):
         month_name = datetime.strptime(str(month), "%m").strftime("%B")
@@ -139,87 +137,34 @@ def wallet_view(request):
         'balance': total_amount,
         'report': monthly_report,
         'analysis_results': analysis_results,
-        'theme': theme
-
     }
     return render(request, 'home/wallet/index.html', context)
 
 
 @login_required()
-def settings_view(request):
+def profile_view(request):
     if request.method == 'POST':
         password_form = PasswordChangeForm(request.user, request.POST)
         if password_form.is_valid():
             user = password_form.save()
             update_session_auth_hash(request, user)  # Aktualizuje sesję użytkownika
             messages.success(request, 'Twoje hasło zostało pomyślnie zmienione!')
-            return redirect('settings')  # lub inny adres URL do przekierowania
+            return redirect('profile')  # lub inny adres URL do przekierowania
         else:
             messages.error(request, 'Proszę poprawić błąd poniżej.')
     else:
         password_form = PasswordChangeForm(request.user)
-    user = request.user
-    theme = get_actual_theme(user)
-    themes = [
-        "light",
-        "dark",
-        "cupcake",
-        "bumblebee",
-        "emerald",
-        "corporate",
-        "synthwave",
-        "retro",
-        "cyberpunk",
-        "valentine",
-        "halloween",
-        "garden",
-        "forest",
-        "aqua",
-        "lofi",
-        "pastel",
-        "fantasy",
-        "wireframe",
-        "black",
-        "luxury",
-        "dracula",
-        "cmyk",
-        "autumn",
-        "business",
-        "acid",
-        "lemonade",
-        "night",
-        "coffee",
-        "winter",
-        "dim",
-        "nord",
-        "sunset",
-    ]
     lang = {
         'en': 'English',
         'pl': 'Polish'
     }
 
     context = {
-        'themes': themes,
         'languages': lang,
-        'theme': theme,
         'password_form': password_form
     }
 
-    return render(request, 'home/settings/index.html', context)
-
-
-def save_theme(request):
-    if request.method == "POST":
-        theme = request.POST.get('theme')
-
-        # Update or create the user settings
-        Settings.objects.update_or_create(
-            user=request.user,
-            defaults={'theme': theme}
-        )
-        user_settings, created = Settings.objects.get_or_create(user=request.user)
-        return redirect('settings')
+    return render(request, 'home/userProfile/index.html', context)
 
 
 def analyze_monthly_balances(user):
@@ -268,12 +213,3 @@ def analyze_monthly_balances(user):
         'current_month_balance': current_month_balance,
         'previous_month_balance': previous_month_balance,
     }
-
-
-def get_actual_theme(user):
-    try:
-        settings = Settings.objects.get(user=user)
-        theme = settings.theme
-    except ObjectDoesNotExist:
-        theme = 'cupcake'
-    return theme

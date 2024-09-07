@@ -4,7 +4,7 @@
 
 {% block content %}
     {% include 'home/expenses/add.html' %}
-    <div class="overflow-x-auto">
+    <div class="overflow-x-auto" >
 
         <table class="table">
             <thead>
@@ -19,8 +19,8 @@
             </thead>
             <tbody>
             {% for expense in page_obj.object_list %}
-                <tr>
-                    <td>{{ forloop.counter }}</td>
+                <tr class="text-dark">
+                    <td >{{ forloop.counter }}</td>
                     <td>{{ expense.name }}</td>
                     <td>{{ expense.amount }} zł</td>
                     <td>{{ expense.date }}</td>
@@ -50,12 +50,12 @@
         </table>
         <!-- Paginacja -->
         <div class="pagination">
-        <span class="step-links">
+        <span class="step-links " data-theme="dark">
             {% if page_obj.has_previous %}
                 <a href="?page=1">&laquo; first</a>
                 <a href="?page={{ page_obj.previous_page_number }}">previous</a>
             {% else %}
-                <span class="disabled">&laquo; first</span>
+                <span class="disabled text-dark">&laquo; first</span>
                 <span class="disabled">previous</span>
             {% endif %}
 

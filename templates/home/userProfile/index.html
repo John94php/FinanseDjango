@@ -1,34 +1,8 @@
 {% extends "_auth.html" %}
 
-{% block title %}Settings{% endblock %}
+{% block title %}Profile{% endblock %}
 
 {% block content %}
-    <div class="settings-container">
-        <div class="theme-selector">
-            <div class="header">
-                <span>Theme</span>
-            </div>
-            <div class="theme-container overflow-auto max-h-60">
-                <div class="join join-vertical">
-                    <form method="post" action="{% url 'save_theme' %}">
-                        {% csrf_token %}
-                        {% for theme in themes %}
-                            <label class="join-item flex items-center">
-                                <input
-                                        type="radio"
-                                        name="theme"
-                                        class="btn theme-controller"
-                                        aria-label="{{ theme }}"
-                                        value="{{ theme }}"/>
-                            </label>
-                        {% endfor %}
-                        <button class="btn btn-primary" type="submit" id="save-theme-btn">Save theme</button>
-
-                    </form>
-                </div>
-            </div>
-
-        </div>
 <div class="container mx-auto mt-10">
     <h1 class="text-2xl font-bold mb-6">Zmiana Hasła</h1>
     <form method="post">

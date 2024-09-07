@@ -11,7 +11,7 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.AlterField(
-            model_name='settings',
+            model_name='userProfile',
             name='language',
             field=models.CharField(blank=True, max_length=100, null=True),
         ),

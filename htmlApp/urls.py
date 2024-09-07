@@ -28,8 +28,7 @@ urlpatterns = [
                   path('incomes/', views.incomes_view, name='incomes'),
                   path('expenses/', views.expenses_view, name='expenses'),
                   path('wallet/', views.wallet_view, name='wallet'),
-                  path('settings/', views.settings_view, name='settings'),
-
-                  path('save-theme/', views.save_theme, name='save_theme'),
+                  path('userProfile/', views.profile_view, name='userProfile'),
+                  path('set-theme/', views.set_theme, name='set_theme'),
 
               ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
